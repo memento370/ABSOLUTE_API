@@ -1,6 +1,5 @@
 package com.example.absoluteweb.config;
 
-import com.example.absoluteweb.site.services.JwtAuthenticationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -26,6 +25,8 @@ public class SecurityConfig {
     @Autowired
     private JwtAuthenticationFilter jwtAuthenticationFilter;
     @Autowired
+    private JwtAuthenticationFilter jwtAuthenticationFilterForum;
+    @Autowired
     private RateLimitingFilter rateLimitingFilter;
 
     @Bean
@@ -45,7 +46,11 @@ public class SecurityConfig {
                                 "/api/forum/user/check-register",
                                 "/api/forum/user/send-verification",
                                 "/api/forum/user/verify-code",
-                                "/api/forum/user/login").permitAll()
+                                "/api/forum/user/login",
+                                "/api/forum/user/send-verification-restore",
+                                "/api/forum/user/verify-code-restore",
+                                "/api/forum/user/restore-password",
+                                "/api/forum/user/check-token").permitAll()
                         .requestMatchers("/index.html", "/static/**", "/favicon.ico").permitAll()
                         .anyRequest().authenticated()
                 )
@@ -53,6 +58,8 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable());
         http.addFilterBefore(rateLimitingFilter, UsernamePasswordAuthenticationFilter.class);
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(jwtAuthenticationFilterForum, UsernamePasswordAuthenticationFilter.class);
+
 
         return http.build();
     }

@@ -1,11 +1,10 @@
-package com.example.absoluteweb.site.services;
+package com.example.absoluteweb.config;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -16,7 +15,7 @@ import java.io.IOException;
 import java.util.Collections;
 
 @Component
-public class JwtAuthenticationFilter extends OncePerRequestFilter {
+public class JwtAuthenticationFilterForum extends OncePerRequestFilter {
 
     @Autowired
     private JwtUtils jwtUtils;
@@ -29,15 +28,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String token = authHeader.substring(7);
-            if (jwtUtils.validateToken(token)) {
-                // Отримуємо username та роль
-                String username = jwtUtils.getUsernameFromToken(token);
-                String role = jwtUtils.getRoleFromToken(token);
-
+            if (jwtUtils.validateTokenForum(token)) {
+                String nickname = jwtUtils.getNickForumFromToken(token);
+                String role = jwtUtils.getRoleForumFromToken(token);
                 // Створюємо Authentication об’єкт
                 UsernamePasswordAuthenticationToken authentication =
                         new UsernamePasswordAuthenticationToken(
-                                username,
+                                nickname,
                                 null,
                                 Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + role))
                         );

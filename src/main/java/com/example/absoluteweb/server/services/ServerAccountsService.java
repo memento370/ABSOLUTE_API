@@ -72,11 +72,6 @@ public class ServerAccountsService {
             }catch (Exception ex) {
                 throw new AccountExceptions("Ошибка сохранения на игровом сервере.");
             }
-
-
-
-
-
     }
     public ResponseEntity<List<CharacterDTO>> getCharacters(String accountName) {
         List<GameCharacter> characters = gameCharacterRep.findByAccountName(accountName);

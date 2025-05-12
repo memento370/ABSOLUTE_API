@@ -1,5 +1,6 @@
 package com.example.absoluteweb.forum.controllers;
 
+import com.example.absoluteweb.config.JwtUtils;
 import com.example.absoluteweb.forum.DTO.ForumRegistrationRequest;
 import com.example.absoluteweb.forum.DTO.UserDTO;
 import com.example.absoluteweb.forum.entity.User;
@@ -21,7 +22,7 @@ import java.util.Map;
 public class UserController {
 
     private final Map<String, String> verificationCodes = new HashMap<>();
-
+    private final Map<String, String> verificationCodesRestore = new HashMap<>();
 
     @Autowired
     private UserRep userRepository;
@@ -29,6 +30,9 @@ public class UserController {
     private UserService userService;
     @Autowired
     private EmailServiceForum emailServiceForum;
+    @Autowired
+    private JwtUtils jwtUtils;
+
     @GetMapping
     public List<User> getAllUsers() {
         return userRepository.findAll();
@@ -44,7 +48,7 @@ public class UserController {
     }
 
     @PostMapping("/create-user")
-    public ResponseEntity<User> createUser(@RequestBody ForumRegistrationRequest user) {
+    public ResponseEntity createUser(@RequestBody ForumRegistrationRequest user) {
         try{
             return userService.createUser(user);
         }catch(UserException e){
@@ -106,6 +110,57 @@ public class UserController {
         }
         catch (UserException e){
             return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+    @PostMapping("/login")
+    public ResponseEntity login(@RequestBody ForumRegistrationRequest login) {
+        try{
+            return userService.login(login);
+        } catch (UserException e){
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @PostMapping("/check-token")
+    public Boolean checkToken(@RequestBody String token) {
+        return jwtUtils.validateTokenForum(token);
+    }
+
+    @PostMapping("/restore-password")
+    public ResponseEntity restorePassword(@RequestBody Map<String, String> request) {
+        try{
+            return userService.restorePassword(request.get("email"),request.get("pass"));
+        } catch (UserException e){
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+
+
+    @PostMapping("/send-verification-restore")
+    public ResponseEntity<String> sendVerificationCodeRestore(@RequestBody Map<String, String> request) {
+
+        String email = request.get("email");
+        try{
+            String code = emailServiceForum.sendVerificationEmailRestore(email);
+            verificationCodesRestore.put(email, code);
+            return ResponseEntity.ok("Код підтвердження відправлено на " + email);
+        }catch (MailSendException e){
+            System.out.println(e.getMessage());
+            return ResponseEntity.badRequest().body("Введён некоректный e-mail");
+        }
+    }
+
+    @PostMapping("/verify-code-restore")
+    public ResponseEntity<String> verifyCodeRestore(@RequestBody Map<String, String> request) {
+        String email = request.get("email");
+        String code = request.get("code");
+
+        if (verificationCodesRestore.containsKey(email) && verificationCodesRestore.get(email).equals(code)) {
+            verificationCodesRestore.remove(email);
+            return ResponseEntity.ok("Код подтверждён");
+        } else {
+            return ResponseEntity.badRequest().body("Введен неверный код.");
         }
     }
 }
