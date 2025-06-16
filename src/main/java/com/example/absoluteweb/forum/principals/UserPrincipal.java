@@ -10,6 +10,8 @@ import java.util.List;
 public record UserPrincipal(Long id, String nick, String role) implements UserDetails {
 
     @Override public String getUsername() { return nick; }
+    public Long getId() { return id; }
+
     @Override public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority("ROLE_" + role));
     }

@@ -60,7 +60,11 @@ public class SecurityConfig {
                                 "/api/forum/user/restore-password",
                                 "/api/forum/user/check-token",
                                 "/api/forum/user/get-user/{id}",
-                                "/api/forum/user/check-user-token").permitAll()
+                                "/api/forum/user/check-user-token",
+                                "/api/forum/topic/by-section/{section}",
+                                "/api/forum/topic/{id}",
+                                "/api/forum/comment-topic/{topicId}",
+                                "/api/forum/topic/by-section/**").permitAll()
                         .requestMatchers("/index.html", "/static/**", "/favicon.ico").permitAll()
                         .anyRequest().authenticated()
                 )

@@ -29,7 +29,9 @@ public class RateLimitingFilter extends OncePerRequestFilter {
             "/api/forum/user/verify-code",
             "/api/forum/user/login",
             "/api/forum/user/get-user/{id}",
-            "/api/forum/user/check-user-token"
+            "/api/forum/user/check-user-token",
+            "/api/forum/comment-topic/{topicId}",
+            "/api/forum/topic/{id}"
     );
 
     // Інстанс AntPathMatcher для перевірки співпадіння з шаблонами

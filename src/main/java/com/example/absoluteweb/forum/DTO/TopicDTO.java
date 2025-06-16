@@ -1,15 +1,17 @@
 package com.example.absoluteweb.forum.DTO;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class TopicDTO {
     private Long id;
     private String status;
     private Long createdBy;
     private LocalDateTime creationDate;
-    private String section;
+    private String subSection;
     private String title;
     private String message;
+    private List<Long> comments;;
 
     public Long getId() {
         return id;
@@ -27,14 +29,6 @@ public class TopicDTO {
         this.status = status;
     }
 
-    public Long getCreatedBy() {
-        return createdBy;
-    }
-
-    public void setCreatedBy(Long createdBy) {
-        this.createdBy = createdBy;
-    }
-
     public LocalDateTime getCreationDate() {
         return creationDate;
     }
@@ -43,12 +37,12 @@ public class TopicDTO {
         this.creationDate = creationDate;
     }
 
-    public String getSection() {
-        return section;
+    public String getSubSection() {
+        return subSection;
     }
 
-    public void setSection(String section) {
-        this.section = section;
+    public void setSubSection(String subSection) {
+        this.subSection = subSection;
     }
 
     public String getTitle() {
@@ -65,5 +59,21 @@ public class TopicDTO {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public Long getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(Long createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public List<Long> getComments() {
+        return comments;
+    }
+
+    public void setComments(List<Long> comments) {
+        this.comments = comments;
     }
 }

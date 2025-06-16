@@ -1,18 +1,16 @@
 package com.example.absoluteweb.forum.services;
 
 import com.example.absoluteweb.config.JwtUtils;
-import com.example.absoluteweb.config.Whirlpool2PasswordEncoder;
 import com.example.absoluteweb.forum.DTO.ForumRegistrationRequest;
 import com.example.absoluteweb.forum.DTO.UserDTO;
 import com.example.absoluteweb.forum.entity.User;
 import com.example.absoluteweb.forum.exceptions.UserException;
-import com.example.absoluteweb.forum.repository.MessageRep;
+import com.example.absoluteweb.forum.repository.CommentTopicRep;
 import com.example.absoluteweb.forum.repository.TopicRep;
 import com.example.absoluteweb.forum.repository.UserRep;
 import com.google.cloud.storage.BlobId;
 import com.google.cloud.storage.BlobInfo;
 import com.google.cloud.storage.Storage;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.MailSendException;
@@ -21,7 +19,6 @@ import org.springframework.stereotype.Service;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
-import java.security.Security;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
@@ -32,7 +29,7 @@ public class UserService {
     private final JwtUtils jwtUtils;
     private final EmailServiceForum emailServiceForum;
     private final PasswordEncoder passwordEncoder;
-    private final MessageRep messageRepository;
+    private final CommentTopicRep commentTopicRepository;
     private final UserRep userRepository;
     private final TopicRep topicRepository;
     private final Storage storage;
@@ -50,7 +47,7 @@ public class UserService {
 
     @Autowired
     public UserService(
-            MessageRep messageRepository,
+            CommentTopicRep commentTopicRepository,
             UserRep userRepository,
             TopicRep topicRepository,
             PasswordEncoder passwordEncoder,
@@ -58,7 +55,7 @@ public class UserService {
             EmailServiceForum emailServiceForum,
             JwtUtils jwtUtils
     ) {
-        this.messageRepository = messageRepository;
+        this.commentTopicRepository = commentTopicRepository;
         this.userRepository = userRepository;
         this.topicRepository = topicRepository;
         this.passwordEncoder = passwordEncoder;
@@ -85,7 +82,7 @@ public class UserService {
         return ResponseEntity.ok(user);
     }
 
-    public ResponseEntity createUser(ForumRegistrationRequest user) throws UserException {
+    public ResponseEntity<?> createUser(ForumRegistrationRequest user) throws UserException {
         checkRegister(user);
         User createUser = new User();
         createUser.setEmail(user.getEmail());
@@ -143,7 +140,7 @@ public class UserService {
         return true;
     }
 
-    public ResponseEntity login(ForumRegistrationRequest login) throws UserException {
+    public ResponseEntity<?> login(ForumRegistrationRequest login) throws UserException {
         User user = userRepository.findByLogin(login.getLogin());
         if (user == null) {
             throw new UserException("Логин не найден. Убедитесь в правильности введенных данных.");
@@ -165,17 +162,8 @@ public class UserService {
 
         return ResponseEntity.ok(response);
     }
-    private boolean verifyPassword(String rawPassword, String storedHash) throws UserException {
-        try {
-            MessageDigest md = MessageDigest.getInstance("WHIRLPOOL", "BC");
-            byte[] hashBytes = md.digest(rawPassword.getBytes(StandardCharsets.UTF_8));
-            String encodedInputPassword = Base64.getEncoder().encodeToString(hashBytes);
-            return encodedInputPassword.equals(storedHash);
-        } catch (Exception ex) {
-            throw new UserException("Ошибка зашифровки пароля");
-        }
-    }
-    public ResponseEntity restorePassword(String email, String password) throws UserException {
+
+    public ResponseEntity<?> restorePassword(String email, String password) throws UserException {
         User user = userRepository.findByEmail(email);
         if (user == null) {
             throw new UserException("Е-мейл не найден.Убедитесь в правильности данных.");

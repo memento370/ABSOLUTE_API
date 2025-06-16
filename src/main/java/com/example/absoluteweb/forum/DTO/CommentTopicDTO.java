@@ -1,14 +1,15 @@
 package com.example.absoluteweb.forum.DTO;
 
+import com.example.absoluteweb.forum.entity.User;
+
 import java.time.LocalDateTime;
 
-public class TopicMessageDTO {
+public class CommentTopicDTO {
     private Long id;
     private String text;
     private LocalDateTime creationDate;
-
-    private Long createdBy;
-    private Long topic;
+    private UserDTO createdBy;
+    private Long topicId;
 
     public Long getId() {
         return id;
@@ -34,19 +35,19 @@ public class TopicMessageDTO {
         this.creationDate = creationDate;
     }
 
-    public Long getCreatedBy() {
+    public Long getTopicId() {
+        return topicId;
+    }
+
+    public void setTopicId(Long topicId) {
+        this.topicId = topicId;
+    }
+
+    public UserDTO getCreatedBy() {
         return createdBy;
     }
 
-    public void setCreatedBy(Long createdBy) {
+    public void setCreatedBy(UserDTO createdBy) {
         this.createdBy = createdBy;
-    }
-
-    public Long getTopic() {
-        return topic;
-    }
-
-    public void setTopic(Long topic) {
-        this.topic = topic;
     }
 }

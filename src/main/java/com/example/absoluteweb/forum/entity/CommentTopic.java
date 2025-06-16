@@ -1,12 +1,13 @@
 package com.example.absoluteweb.forum.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "message")
-public class Message {
+@Table(name = "comment_topic")
+public class CommentTopic {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -15,8 +16,7 @@ public class Message {
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User createdBy;
-
-
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "topic_id", nullable = false)
     private Topic topic;
@@ -24,12 +24,13 @@ public class Message {
     @Column(columnDefinition = "TEXT")
     private String text;
 
+    @Column(name = "creation_date")
     private LocalDateTime creationDate;
 
-    public Message() {
+    public CommentTopic() {
     }
 
-    public Message(User createdBy, Topic topic, String text, LocalDateTime creationDate) {
+    public CommentTopic(User createdBy, Topic topic, String text, LocalDateTime creationDate) {
         this.createdBy = createdBy;
         this.topic = topic;
         this.text = text;

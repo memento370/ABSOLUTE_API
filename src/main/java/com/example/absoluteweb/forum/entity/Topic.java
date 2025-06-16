@@ -1,8 +1,11 @@
 package com.example.absoluteweb.forum.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "topic")
@@ -18,27 +21,29 @@ public class Topic {
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User createdBy;
-
+    @Column(name = "creation_date")
     private LocalDateTime creationDate;
-
-    private String section;
+    @Column(name = "sub_section")
+    private String subSection;
 
     private String title;
 
     @Column(columnDefinition = "TEXT")
     private String message;
-
-
+    @JsonIgnore
+    @OneToMany(mappedBy = "topic", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<CommentTopic> comments = new ArrayList<>();
     public Topic() {
     }
 
-    public Topic(String status, User createdBy, LocalDateTime creationDate, String section, String title, String message) {
+    public Topic(String status, User createdBy, LocalDateTime creationDate, String subSection, String title, String message) {
         this.status = status;
         this.createdBy = createdBy;
         this.creationDate = creationDate;
-        this.section = section;
+        this.subSection = subSection;
         this.title = title;
         this.message = message;
+        this.comments = new ArrayList<>();
     }
 
     public Long getId() {
@@ -73,12 +78,12 @@ public class Topic {
         this.creationDate = creationDate;
     }
 
-    public String getSection() {
-        return section;
+    public String getSubSection() {
+        return subSection;
     }
 
-    public void setSection(String section) {
-        this.section = section;
+    public void setSubSection(String subSection) {
+        this.subSection = subSection;
     }
 
     public String getTitle() {
@@ -95,5 +100,13 @@ public class Topic {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public List<CommentTopic> getComments() {
+        return comments;
+    }
+
+    public void setComments(List<CommentTopic> comments) {
+        this.comments = comments;
     }
 }

@@ -15,13 +15,13 @@ CREATE TABLE IF NOT EXISTS topic (
                                      status VARCHAR(255),
     user_id BIGINT NOT NULL,
     creation_date TIMESTAMP,
-    section VARCHAR(255),
+    sub_section VARCHAR(255),
     title VARCHAR(255),
     message TEXT,
     FOREIGN KEY (user_id) REFERENCES user(id)
     );
 
-CREATE TABLE IF NOT EXISTS message (
+CREATE TABLE IF NOT EXISTS comment_topic (
                                        id BIGINT PRIMARY KEY AUTO_INCREMENT,
                                        user_id BIGINT NOT NULL,
                                        topic_id BIGINT NOT NULL,

@@ -60,7 +60,7 @@ public class UserController {
     }
 
     @PostMapping("/create-user")
-    public ResponseEntity createUser(@RequestBody ForumRegistrationRequest user) {
+    public ResponseEntity<?> createUser(@RequestBody ForumRegistrationRequest user) {
         try{
             return userService.createUser(user);
         }catch(UserException e){
@@ -105,7 +105,7 @@ public class UserController {
     }
 
     @PostMapping("/check-register")
-    public ResponseEntity checkRegister(@RequestBody ForumRegistrationRequest regAcc) {
+    public ResponseEntity<?> checkRegister(@RequestBody ForumRegistrationRequest regAcc) {
         try {
             userService.checkRegister(regAcc);
             return ResponseEntity.ok("login and e-mail valid");
@@ -115,7 +115,7 @@ public class UserController {
         }
     }
     @PostMapping("/login")
-    public ResponseEntity login(@RequestBody ForumRegistrationRequest login) {
+    public ResponseEntity<?> login(@RequestBody ForumRegistrationRequest login) {
         try{
             return userService.login(login);
         } catch (UserException e){
@@ -133,7 +133,7 @@ public class UserController {
     }
 
     @PostMapping("/restore-password")
-    public ResponseEntity restorePassword(@RequestBody Map<String, String> request) {
+    public ResponseEntity<?> restorePassword(@RequestBody Map<String, String> request) {
         try{
             return userService.restorePassword(request.get("email"),request.get("pass"));
         } catch (UserException e){

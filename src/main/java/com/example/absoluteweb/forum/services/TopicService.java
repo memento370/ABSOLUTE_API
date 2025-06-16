@@ -1,88 +1,161 @@
 package com.example.absoluteweb.forum.services;
 
 import com.example.absoluteweb.forum.DTO.TopicDTO;
+import com.example.absoluteweb.forum.entity.CommentTopic;
 import com.example.absoluteweb.forum.entity.Topic;
 import com.example.absoluteweb.forum.entity.User;
-import com.example.absoluteweb.forum.exceptions.TopicEcception;
-import com.example.absoluteweb.forum.repository.MessageRep;
+import com.example.absoluteweb.forum.exceptions.TopicException;
 import com.example.absoluteweb.forum.repository.TopicRep;
 import com.example.absoluteweb.forum.repository.UserRep;
+import com.example.absoluteweb.forum.principals.UserPrincipal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class TopicService {
 
-    private MessageRep messageRepository;
-
-    private UserRep userRepository;
-
-    private TopicRep topicRepository;
+    private final TopicRep topicRepository;
+    private final UserRep userRepository;
 
     @Autowired
-    public TopicService(MessageRep messageRepository, UserRep userRepository, TopicRep topicRepository) {
-        this.messageRepository = messageRepository;
-        this.userRepository = userRepository;
+    public TopicService(TopicRep topicRepository, UserRep userRepository) {
         this.topicRepository = topicRepository;
+        this.userRepository = userRepository;
     }
 
-    public ResponseEntity<Topic> getTopic(TopicDTO topic) throws TopicEcception {
-        Topic topicFind = new Topic();
-        topicFind = topicRepository.findById(topic.getId()).orElse(null);
-        return ResponseEntity.ok(topicFind);
-    }
-    public ResponseEntity<Topic> createTopic(TopicDTO topicDTO) throws TopicEcception {
-        Topic topic = new Topic();
-        User user = userRepository.findById(topicDTO.getCreatedBy()).orElse(null);
-        if (user == null) {
-            throw new TopicEcception("Topic user null");
+    public ResponseEntity<?> createTopic(TopicDTO topicDTO, UserPrincipal principal) throws TopicException {
+        User user = userRepository.findById(principal.getId()).orElse(null);
+        if (user == null){
+            throw new TopicException("User not found");
         }
+        if(topicDTO.getTitle().isBlank()){
+            throw new TopicException("Назва теми має бути заповненою");
+        }
+        if(topicDTO.getMessage().isBlank()){
+            throw new TopicException("Текст теми має бути заповненим");
+        }
+        if(topicDTO.getTitle().length()>250){
+            throw new TopicException("Назва теми не може перевищувати 250 символів");
+        }
+        if(topicDTO.getMessage().length()>5000){
+            throw new TopicException("Текст теми не може перевищувати 5000 символів");
+        }
+        Topic topic = new Topic();
         topic.setCreatedBy(user);
         topic.setCreationDate(LocalDateTime.now());
-        try{
-            topicRepository.save(topic);
-            return ResponseEntity.ok(topic);
-        }catch (TopicEcception e){
-            return ResponseEntity.badRequest().build();
-        }
-    }
-    public ResponseEntity<Topic> updateTopic(TopicDTO topicDTO) throws TopicEcception {
-        Topic topic = topicRepository.findById(topicDTO.getId()).orElse(null);
-        if (topic == null) {
-            throw new TopicEcception("Topic not found");
-        }
-        if(topic.getCreatedBy().getId()!=topicDTO.getCreatedBy()){
-            throw new TopicEcception("Topic creator not available");
-        }
-        topic.setStatus(topicDTO.getStatus());
-        topic.setSection(topicDTO.getSection());
+        topic.setSubSection(topicDTO.getSubSection());
         topic.setTitle(topicDTO.getTitle());
         topic.setMessage(topicDTO.getMessage());
-        try{
+        topic.setStatus("ACTIVE");
+
+        try {
             topicRepository.save(topic);
-            return ResponseEntity.ok(topic);
-        }catch (TopicEcception e){
-            return ResponseEntity.badRequest().build();
+
+            // Повертаємо DTO (можна мінімально)
+            TopicDTO responseDTO = new TopicDTO();
+            responseDTO.setId(topic.getId());
+            responseDTO.setSubSection(topic.getSubSection());
+            responseDTO.setTitle(topic.getTitle());
+            responseDTO.setMessage(topic.getMessage());
+            responseDTO.setStatus(topic.getStatus());
+            responseDTO.setCreatedBy(user.getId());
+            responseDTO.setCreationDate(topic.getCreationDate());
+
+            return ResponseEntity.ok(responseDTO);
+
+            // Або якщо хочеш мінімум:
+            // return ResponseEntity.ok(Map.of("id", topic.getId()));
+
+        } catch (Exception e) {
+            throw new TopicException("Помилка збереження теми : " + e.getMessage());
+        }
+    }
+
+
+    // Отримати всі теми за секцією
+    public ResponseEntity<List<TopicDTO>> getTopicsBySection(String subSection) {
+        List<Topic> topics = topicRepository.findBySubSection(subSection);
+        List<TopicDTO> dtos = new ArrayList<>();
+        for (Topic topic : topics) {
+            TopicDTO dto = new TopicDTO();
+            dto.setId(topic.getId());
+            dto.setStatus(topic.getStatus());
+            dto.setCreatedBy(topic.getCreatedBy().getId());
+            dto.setCreationDate(topic.getCreationDate());
+            dto.setSubSection(topic.getSubSection());
+            dto.setTitle(topic.getTitle());
+            dto.setMessage(topic.getMessage());
+            dtos.add(dto);
+        }
+        return ResponseEntity.ok(dtos);
+    }
+
+    public ResponseEntity<TopicDTO> getTopicById(Long id) {
+       Topic topic = topicRepository.findById(id).orElse(null);
+       if(topic == null) throw new TopicException("Topic not found");
+       TopicDTO dto = new TopicDTO();
+       dto.setId(topic.getId());
+       dto.setStatus(topic.getStatus());
+       dto.setCreatedBy(topic.getCreatedBy().getId());
+       dto.setCreationDate(topic.getCreationDate());
+       dto.setSubSection(topic.getSubSection());
+       dto.setTitle(topic.getTitle());
+       dto.setMessage(topic.getMessage());
+       return ResponseEntity.ok(dto);
+    }
+    public ResponseEntity<?> updateTopic(Long id, TopicDTO dto, UserPrincipal principal) throws TopicException {
+        Topic topic = topicRepository.findById(id).orElse(null);
+        if (topic == null) throw new TopicException("Topic not found");
+
+        // Дозволяємо редагувати лише автору теми!
+        if (!topic.getCreatedBy().getId().equals(principal.getId())) {
+            throw new TopicException("You have no rights to edit this topic");
+        }
+        if(dto.getTitle().isBlank()){
+            throw new TopicException("Назва теми має бути заповненою");
+        }
+        if(dto.getMessage().isBlank()){
+            throw new TopicException("Текст теми має бути заповненим");
+        }
+        if(dto.getTitle().length()>250){
+            throw new TopicException("Назва теми не може перевищувати 250 символів");
+        }
+        if(dto.getMessage().length()>5000){
+            throw new TopicException("Текст теми не може перевищувати 5000 символів");
         }
 
-    }
-    public ResponseEntity<Topic> deleteTopic(TopicDTO topicDTO) throws TopicEcception {
-        Topic topic = topicRepository.findById(topicDTO.getId()).orElse(null);
-        if (topic == null) {
-            throw new TopicEcception("Topic not found");
-        }
-        if(topic.getCreatedBy().getId()!=topicDTO.getCreatedBy()){
-            throw new TopicEcception("Topic creator not available");
-        }
-        try{
-            topicRepository.delete(topic);
-            return ResponseEntity.ok(topic);
-        }catch (TopicEcception e){
-            return ResponseEntity.badRequest().build();
-        }
+        topic.setTitle(dto.getTitle());
+        topic.setMessage(dto.getMessage());
+        topic.setSubSection(dto.getSubSection());
+        // За потреби — можна оновити статус
 
+        topicRepository.save(topic);
+
+        TopicDTO updatedDto = new TopicDTO();
+        updatedDto.setId(topic.getId());
+        updatedDto.setStatus(topic.getStatus());
+        updatedDto.setCreatedBy(topic.getCreatedBy().getId());
+        updatedDto.setCreationDate(topic.getCreationDate());
+        updatedDto.setSubSection(topic.getSubSection());
+        updatedDto.setTitle(topic.getTitle());
+        updatedDto.setMessage(topic.getMessage());
+
+        return ResponseEntity.ok(updatedDto);
     }
+
+    public void deleteTopic(Long id, UserPrincipal principal) throws TopicException {
+        Topic topic = topicRepository.findById(id).orElse(null);
+        if (topic == null) throw new TopicException("Topic not found");
+        if (!topic.getCreatedBy().getId().equals(principal.getId())) {
+            throw new TopicException("You have no rights to delete this topic");
+        }
+        topicRepository.delete(topic);
+        // НЕ повертай topic!
+    }
+
 }
