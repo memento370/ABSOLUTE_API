@@ -28,13 +28,6 @@ import java.util.Map;
 @RequestMapping("/api/forum/user")
 public class UserController {
 
-    private final Map<String, String> verificationCodes = new HashMap<>();
-    private final Map<String, String> verificationCodesRestore = new HashMap<>();
-    private final Map<String, String> verificationCodesLogin = new HashMap<>();
-    private final Map<String, String> verificationCodesOldEmail = new HashMap<>();
-    private final Map<String, String> verificationCodesNewEmail = new HashMap<>();
-    private final Map<String, String> verificationCodesPassword = new HashMap<>();
-
     private final UserRep userRepository;
     private final UserService userService;
     private final JwtUtils jwtUtils;
@@ -75,7 +68,6 @@ public class UserController {
 //            return ResponseEntity.ok().<Void>build();
 //        }).orElse(ResponseEntity.notFound().build());
 //    }
-
 
     @PostMapping("/send-verification")
     public ResponseEntity<String> sendVerificationCode(@RequestBody Map<String, String> request) {
@@ -141,8 +133,6 @@ public class UserController {
         }
     }
 
-
-
     @PostMapping("/send-verification-restore")
     public ResponseEntity<String> sendVerificationCodeRestore(@RequestBody Map<String, String> request) {
         try {
@@ -173,7 +163,6 @@ public class UserController {
     @PostMapping("/upload-avatar")
     public ResponseEntity<String> uploadAvatar(@RequestBody AvatarUploadRequest request,
                                                @AuthenticationPrincipal UserPrincipal principal) {
-
         String avatarUrl = userService.uploadUserAvatar(principal.id(), request.getBase64Image());
         return ResponseEntity.ok(avatarUrl);
     }
@@ -181,7 +170,6 @@ public class UserController {
     @PreAuthorize("hasRole('USER')")
     @DeleteMapping("/delete-avatar")
     public ResponseEntity<Void> deleteAvatar(@AuthenticationPrincipal UserPrincipal principal) {
-
         userService.deleteUserAvatar(principal.id());
         return ResponseEntity.noContent().build();
     }
@@ -191,7 +179,6 @@ public class UserController {
     public ResponseEntity<UserDTO> updateProfile(
             @RequestBody UserDTO request,
             @AuthenticationPrincipal UserPrincipal principal) {
-
         UserDTO updated = userService.updateUserProfile(principal.id(), request);
         return ResponseEntity.ok(updated);
     }
@@ -212,7 +199,6 @@ public class UserController {
     public ResponseEntity<String> changeLogin(
             @RequestBody Map<String, String> request,
             @AuthenticationPrincipal UserPrincipal principal) {
-
         String newLogin = request.get("login");
         String code = request.get("code");
         try {
@@ -223,11 +209,9 @@ public class UserController {
         }
     }
 
-
     @PreAuthorize("hasRole('USER')")
     @PostMapping("/send-verification-old-email")
     public ResponseEntity<String> sendVerificationCodeOldEmail(@AuthenticationPrincipal UserPrincipal principal) {
-
         try {
             String result = userService.sendVerificationCodeOldEmail(principal.id());
             return ResponseEntity.ok(result);
@@ -241,7 +225,6 @@ public class UserController {
     public ResponseEntity<String> sendVerificationCodeNewEmail(
             @RequestBody Map<String, String> request,
             @AuthenticationPrincipal UserPrincipal principal) {
-
         String newEmail = request.get("newEmail");
         try {
             String result = userService.sendVerificationCodeNewEmail(principal.id(), newEmail);
@@ -256,7 +239,6 @@ public class UserController {
     public ResponseEntity<String> changeEmail(
             @RequestBody Map<String, String> request,
             @AuthenticationPrincipal UserPrincipal principal) {
-
         String oldEmailCode = request.get("oldEmailCode");
         String newEmail = request.get("newEmail");
         String newEmailCode = request.get("newEmailCode");
@@ -284,7 +266,6 @@ public class UserController {
     public ResponseEntity<String> changePassword(
             @RequestBody Map<String, String> request,
             @AuthenticationPrincipal UserPrincipal principal) {
-
         String oldPassword = request.get("oldPassword");
         String newPassword = request.get("newPassword");
         String code = request.get("code");

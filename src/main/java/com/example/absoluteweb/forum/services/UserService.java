@@ -16,9 +16,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.mail.MailSendException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
@@ -35,15 +32,12 @@ public class UserService {
     private final Storage storage;
     private final String BUCKET_NAME = "l2-absolute-forum-one";
 
-
-
     private final Map<String, String> verificationCodes = new HashMap<>();
     private final Map<String, String> verificationCodesRestore = new HashMap<>();
     private final Map<String, String> verificationCodesLogin = new HashMap<>();
     private final Map<String, String> verificationCodesOldEmail = new HashMap<>();
     private final Map<String, String> verificationCodesNewEmail = new HashMap<>();
     private final Map<String, String> verificationCodesPassword = new HashMap<>();
-
 
     @Autowired
     public UserService(
@@ -67,7 +61,7 @@ public class UserService {
     public ResponseEntity<UserDTO> getUserById(Long id) throws UserException {
         User findUser = userRepository.findById(id).orElse(null);
        if (findUser == null) {
-           throw new UserException("Пользователь не найден");
+           throw new UserException("Користувача не знайдено");
        }
        UserDTO user = new UserDTO();
        user.setId(findUser.getId());
@@ -92,12 +86,11 @@ public class UserService {
         createUser.setStatus("active");
         createUser.setRole("USER");
         createUser.setPassword(passwordEncoder.encode(user.getPassword()));
-
         try {
             userRepository.save(createUser);
-            return ResponseEntity.ok("Ваш акаунт зарегистрирован на форуме");
+            return ResponseEntity.ok("Ваш акаунт зареєстровано на форумі");
         } catch (Exception ex) {
-            throw new UserException("Ошибка сохранения на форуме.");
+            throw new UserException("Помилка збереження на форумі");
         }
     }
 
@@ -111,31 +104,31 @@ public class UserService {
         acc.setStatus(regAcc.getStatus());
         User accLogin = userRepository.findByLogin(regAcc.getLogin());
         if(accLogin!=null){
-            throw new UserException("Такой логин уже зарегистрирован");
+            throw new UserException("Такий логін вже зареєстровано");
         }
         User accEmail = userRepository.findByEmail(regAcc.getEmail());
         if(accEmail!=null){
-            throw new UserException("Такой e-mail уже зарегистрирован");
+            throw new UserException("Такий e-mail вже зареєстровано");
         }
         User accNick = userRepository.findByNick(regAcc.getNick());
         if(accNick!=null){
-            throw new UserException("Такой никнейм уже зарегистрирован");
+            throw new UserException("Такий нікнейм вже зареєстровано");
         }
         if(regAcc.getPassword().isEmpty()){
-            throw new UserException("Пароль не может быть пустым");
+            throw new UserException("Пароль не може бути пустим");
         }
         if(regAcc.getLogin().isEmpty()){
-            throw new UserException("Логин не может быть пустым");
+            throw new UserException("Логін не може бути пустим");
         }
         if(regAcc.getEmail().isEmpty()){
-            throw new UserException("E-mail не может быть пустым");
+            throw new UserException("E-mail не може бути пустим");
         }
         if(regAcc.getNick().isEmpty()){
-            throw new UserException("Никнейм не может быть пустым");
+            throw new UserException("Нікнейм не може бути пустим");
         }
         if(regAcc.getLogin().length()>40 || regAcc.getPassword().length()>40 ||
             regAcc.getNick().length()>40 || regAcc.getEmail().length()>40) {
-            throw new UserException("Логин ,пароль,е-мейл,никнейм не могут содержать более 40 символов");
+            throw new UserException("Логін,пароль,нікнейм,e-mail,не можуть бути порожніми.");
         }
         return true;
     }
@@ -143,10 +136,10 @@ public class UserService {
     public ResponseEntity<?> login(ForumRegistrationRequest login) throws UserException {
         User user = userRepository.findByLogin(login.getLogin());
         if (user == null) {
-            throw new UserException("Логин не найден. Убедитесь в правильности введенных данных.");
+            throw new UserException("Логін не знайдено.Пересвідчіться в правильності введених даних.");
         }
         if (!passwordEncoder.matches(login.getPassword(), user.getPassword())) {
-            throw new UserException("Пароль не правильний. Убедитесь в правильности введенных данных.");
+            throw new UserException("Пароль не правильний.Пересвідчіться в правильності введених даних.");
         }
         String token = jwtUtils.generateTokenForum(user);
 
@@ -158,7 +151,7 @@ public class UserService {
         response.put("role", user.getRole());
         response.put("user_id", user.getId().toString());
         response.put("avatar_url", user.getAvatarUrl());
-        response.put("message", "Авторизация успешна");
+        response.put("message", "Авторизація успішна");
 
         return ResponseEntity.ok(response);
     }
@@ -166,11 +159,11 @@ public class UserService {
     public ResponseEntity<?> restorePassword(String email, String password) throws UserException {
         User user = userRepository.findByEmail(email);
         if (user == null) {
-            throw new UserException("Е-мейл не найден.Убедитесь в правильности данных.");
+            throw new UserException("E-mail не знайдено,пересвідчіться в правильності введених даних");
         }
         user.setPassword(passwordEncoder.encode(password));
         userRepository.save(user);
-        return ResponseEntity.ok("Пароль успешно изменён");
+        return ResponseEntity.ok("Пароль успішно змінено");
     }
 
     public String uploadUserAvatar(Long userId, String base64Image) {
@@ -222,7 +215,6 @@ public class UserService {
 
         userRepository.save(user);
         UserDTO result = new UserDTO();
-
         result.setId(user.getId());
         result.setNick(user.getNick());
         result.setTitle(user.getTitle());

@@ -30,7 +30,6 @@ public class TopicController {
             @RequestBody TopicDTO topicDTO,
             @AuthenticationPrincipal UserPrincipal principal) {
         try {
-            // Тут повертаємо вже DTO або мапу з id
             return topicService.createTopic(topicDTO, principal);
         } catch (TopicException e) {
             return ResponseEntity.badRequest().build();
@@ -42,7 +41,6 @@ public class TopicController {
     public ResponseEntity<List<TopicDTO>> getTopicsBySection(@PathVariable String subSection) {
         return topicService.getTopicsBySection(subSection);
     }
-
     @GetMapping("/{id}")
     public ResponseEntity<TopicDTO> getTopicById(@PathVariable Long id) {
         return topicService.getTopicById(id);

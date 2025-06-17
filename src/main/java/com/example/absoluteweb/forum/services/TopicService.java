@@ -1,7 +1,6 @@
 package com.example.absoluteweb.forum.services;
 
 import com.example.absoluteweb.forum.DTO.TopicDTO;
-import com.example.absoluteweb.forum.entity.CommentTopic;
 import com.example.absoluteweb.forum.entity.Topic;
 import com.example.absoluteweb.forum.entity.User;
 import com.example.absoluteweb.forum.exceptions.TopicException;
@@ -31,7 +30,7 @@ public class TopicService {
     public ResponseEntity<?> createTopic(TopicDTO topicDTO, UserPrincipal principal) throws TopicException {
         User user = userRepository.findById(principal.getId()).orElse(null);
         if (user == null){
-            throw new TopicException("User not found");
+            throw new TopicException("Автор теми не знайдений");
         }
         if(topicDTO.getTitle().isBlank()){
             throw new TopicException("Назва теми має бути заповненою");
@@ -45,6 +44,9 @@ public class TopicService {
         if(topicDTO.getMessage().length()>5000){
             throw new TopicException("Текст теми не може перевищувати 5000 символів");
         }
+        if(topicDTO.getSubSection().isBlank()){
+            throw new TopicException("Підрозділ форуму не може бути порожнім");
+        }
         Topic topic = new Topic();
         topic.setCreatedBy(user);
         topic.setCreationDate(LocalDateTime.now());
@@ -52,11 +54,8 @@ public class TopicService {
         topic.setTitle(topicDTO.getTitle());
         topic.setMessage(topicDTO.getMessage());
         topic.setStatus("ACTIVE");
-
         try {
             topicRepository.save(topic);
-
-            // Повертаємо DTO (можна мінімально)
             TopicDTO responseDTO = new TopicDTO();
             responseDTO.setId(topic.getId());
             responseDTO.setSubSection(topic.getSubSection());
@@ -65,19 +64,12 @@ public class TopicService {
             responseDTO.setStatus(topic.getStatus());
             responseDTO.setCreatedBy(user.getId());
             responseDTO.setCreationDate(topic.getCreationDate());
-
             return ResponseEntity.ok(responseDTO);
-
-            // Або якщо хочеш мінімум:
-            // return ResponseEntity.ok(Map.of("id", topic.getId()));
-
         } catch (Exception e) {
             throw new TopicException("Помилка збереження теми : " + e.getMessage());
         }
     }
 
-
-    // Отримати всі теми за секцією
     public ResponseEntity<List<TopicDTO>> getTopicsBySection(String subSection) {
         List<Topic> topics = topicRepository.findBySubSection(subSection);
         List<TopicDTO> dtos = new ArrayList<>();
@@ -110,11 +102,11 @@ public class TopicService {
     }
     public ResponseEntity<?> updateTopic(Long id, TopicDTO dto, UserPrincipal principal) throws TopicException {
         Topic topic = topicRepository.findById(id).orElse(null);
-        if (topic == null) throw new TopicException("Topic not found");
-
-        // Дозволяємо редагувати лише автору теми!
+        if (topic == null){
+            throw new TopicException("Тему не знайдено");
+        }
         if (!topic.getCreatedBy().getId().equals(principal.getId())) {
-            throw new TopicException("You have no rights to edit this topic");
+            throw new TopicException("Ви не можете редагувати чужу тему");
         }
         if(dto.getTitle().isBlank()){
             throw new TopicException("Назва теми має бути заповненою");
@@ -128,12 +120,9 @@ public class TopicService {
         if(dto.getMessage().length()>5000){
             throw new TopicException("Текст теми не може перевищувати 5000 символів");
         }
-
         topic.setTitle(dto.getTitle());
         topic.setMessage(dto.getMessage());
         topic.setSubSection(dto.getSubSection());
-        // За потреби — можна оновити статус
-
         topicRepository.save(topic);
 
         TopicDTO updatedDto = new TopicDTO();
@@ -150,12 +139,13 @@ public class TopicService {
 
     public void deleteTopic(Long id, UserPrincipal principal) throws TopicException {
         Topic topic = topicRepository.findById(id).orElse(null);
-        if (topic == null) throw new TopicException("Topic not found");
+        if (topic == null){
+            throw new TopicException("Тему не знайдено");
+        }
         if (!topic.getCreatedBy().getId().equals(principal.getId())) {
-            throw new TopicException("You have no rights to delete this topic");
+            throw new TopicException("Ви не можете видалити чужу тему");
         }
         topicRepository.delete(topic);
-        // НЕ повертай topic!
     }
 
 }

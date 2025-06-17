@@ -37,7 +37,7 @@ public class CommentTopicService {
         User user = userRepository.findById(principal.getId()).orElse(null);
         Topic topic = topicRepository.findById(dto.getTopicId()).orElse(null);
         if (user == null || topic == null) {
-            throw new CommentTopicException("User or topic not found");
+            throw new CommentTopicException("Автор коментаря не знайдений");
         }
         if(dto.getText().length()>500){
             throw new CommentTopicException("Коментар максимум 500 символів");
@@ -53,7 +53,6 @@ public class CommentTopicService {
 
         CommentTopic saved = commentTopicRepository.save(comment);
 
-        // Ось тут ЗАМІСТЬ saved повертаємо DTO!
         CommentTopicDTO savedDto = new CommentTopicDTO();
         savedDto.setId(saved.getId());
         savedDto.setText(saved.getText());
@@ -78,13 +77,12 @@ public class CommentTopicService {
         return ResponseEntity.ok(savedDto);
     }
 
-
     public ResponseEntity<?> updateComment(Long id, CommentTopicDTO dto, UserPrincipal principal) throws CommentTopicException {
         CommentTopic comment = commentTopicRepository.findById(id).orElse(null);
-        if (comment == null) throw new CommentTopicException("Comment not found");
+        if (comment == null) throw new CommentTopicException("Коментан не знайдено");
 
         if (!comment.getCreatedBy().getId().equals(principal.getId())) {
-            throw new CommentTopicException("No permission to edit this comment");
+            throw new CommentTopicException("Ви не можете редагувати чужий комментар");
         }
         if(dto.getText().length()>500){
             throw new CommentTopicException("Коментар максимум 500 символів");
@@ -96,7 +94,6 @@ public class CommentTopicService {
         comment.setText(dto.getText());
         CommentTopic saved = commentTopicRepository.save(comment);
 
-        // === СФОРМУВАТИ DTO ===
         CommentTopicDTO savedDto = new CommentTopicDTO();
         savedDto.setId(saved.getId());
         savedDto.setText(saved.getText());
