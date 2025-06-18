@@ -15,6 +15,7 @@ public record UserPrincipal(Long id, String nick, String role) implements UserDe
     @Override public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority("ROLE_" + role));
     }
+    public String getRole() { return role; }
 
     /* Інші методи UserDetails – можна повернути true/"" тощо, якщо вони вам не потрібні */
     @Override public String getPassword() { return ""; }

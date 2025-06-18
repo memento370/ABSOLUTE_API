@@ -14,9 +14,19 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class TopicService {
+    private static final Set<String> ALLOWED_SUBSECTIONS = Set.of(
+            "dev-news",
+            "server-info",
+            "bugs-fixes",
+            "suggestions",
+            "news",
+            "discussions",
+            "speaking"
+    );
 
     private final TopicRep topicRepository;
     private final UserRep userRepository;
@@ -46,6 +56,13 @@ public class TopicService {
         }
         if(topicDTO.getSubSection().isBlank()){
             throw new TopicException("Підрозділ форуму не може бути порожнім");
+        }
+        if((topicDTO.getSubSection().equals("dev-news")||topicDTO.getSubSection().equals("server-info"))
+        && !user.getRole().equals("ADMIN")){
+            throw new TopicException("Тему в цьому підрозділі може створювати тільки адміністратор");
+        }
+        if (!ALLOWED_SUBSECTIONS.contains(topicDTO.getSubSection())) {
+            throw new TopicException("Обрана підсекція не існує");
         }
         Topic topic = new Topic();
         topic.setCreatedBy(user);

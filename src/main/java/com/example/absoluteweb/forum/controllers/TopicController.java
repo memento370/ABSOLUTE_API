@@ -32,7 +32,7 @@ public class TopicController {
         try {
             return topicService.createTopic(topicDTO, principal);
         } catch (TopicException e) {
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
