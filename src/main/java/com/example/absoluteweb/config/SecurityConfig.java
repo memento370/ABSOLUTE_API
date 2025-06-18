@@ -82,11 +82,11 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(Arrays.asList(
-                "http://152.53.125.216:8081",
-                "http://152.53.125.216:8080",
-                "http://152.53.125.216:587"
-                ,"http://localhost:8080",
-                "http://localhost:4200"
+                "https://152.53.125.216:8081",
+                "https://152.53.125.216:8080",
+                "https://152.53.125.216:587",
+                "https://localhost:8080",
+                "https://localhost:4200"
         ));
 
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
