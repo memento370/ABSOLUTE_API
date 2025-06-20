@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,7 +23,7 @@ public class Topic {
     @JoinColumn(name = "user_id", nullable = false)
     private User createdBy;
     @Column(name = "creation_date")
-    private LocalDateTime creationDate;
+    private OffsetDateTime creationDate;
     @Column(name = "sub_section")
     private String subSection;
 
@@ -36,7 +37,7 @@ public class Topic {
     public Topic() {
     }
 
-    public Topic(String status, User createdBy, LocalDateTime creationDate, String subSection, String title, String message) {
+    public Topic(String status, User createdBy, OffsetDateTime creationDate, String subSection, String title, String message) {
         this.status = status;
         this.createdBy = createdBy;
         this.creationDate = creationDate;
@@ -70,14 +71,6 @@ public class Topic {
         this.createdBy = createdBy;
     }
 
-    public LocalDateTime getCreationDate() {
-        return creationDate;
-    }
-
-    public void setCreationDate(LocalDateTime creationDate) {
-        this.creationDate = creationDate;
-    }
-
     public String getSubSection() {
         return subSection;
     }
@@ -108,5 +101,13 @@ public class Topic {
 
     public void setComments(List<CommentTopic> comments) {
         this.comments = comments;
+    }
+
+    public OffsetDateTime getCreationDate() {
+        return creationDate;
+    }
+
+    public void setCreationDate(OffsetDateTime creationDate) {
+        this.creationDate = creationDate;
     }
 }

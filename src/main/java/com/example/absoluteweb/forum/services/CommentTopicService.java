@@ -15,6 +15,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,7 +51,7 @@ public class CommentTopicService {
         comment.setCreatedBy(user);
         comment.setTopic(topic);
         comment.setText(dto.getText());
-        comment.setCreationDate(LocalDateTime.now());
+        comment.setCreationDate(OffsetDateTime.now(ZoneOffset.UTC));
 
         CommentTopic saved = commentTopicRepository.save(comment);
 

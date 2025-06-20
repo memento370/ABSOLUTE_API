@@ -1,13 +1,14 @@
 package com.example.absoluteweb.forum.DTO;
 
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 
 public class TopicDTO {
     private Long id;
     private String status;
     private Long createdBy;
-    private LocalDateTime creationDate;
+    private OffsetDateTime creationDate;
     private String subSection;
     private String title;
     private String message;
@@ -27,14 +28,6 @@ public class TopicDTO {
 
     public void setStatus(String status) {
         this.status = status;
-    }
-
-    public LocalDateTime getCreationDate() {
-        return creationDate;
-    }
-
-    public void setCreationDate(LocalDateTime creationDate) {
-        this.creationDate = creationDate;
     }
 
     public String getSubSection() {
@@ -75,5 +68,13 @@ public class TopicDTO {
 
     public void setComments(List<Long> comments) {
         this.comments = comments;
+    }
+
+    public OffsetDateTime getCreationDate() {
+        return creationDate;
+    }
+
+    public void setCreationDate(OffsetDateTime creationDate) {
+        this.creationDate = creationDate;
     }
 }

@@ -12,6 +12,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -66,7 +68,7 @@ public class TopicService {
         }
         Topic topic = new Topic();
         topic.setCreatedBy(user);
-        topic.setCreationDate(LocalDateTime.now());
+        topic.setCreationDate(OffsetDateTime.now(ZoneOffset.UTC));
         topic.setSubSection(topicDTO.getSubSection());
         topic.setTitle(topicDTO.getTitle());
         topic.setMessage(topicDTO.getMessage());

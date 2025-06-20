@@ -3,11 +3,12 @@ package com.example.absoluteweb.forum.DTO;
 import com.example.absoluteweb.forum.entity.User;
 
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 public class CommentTopicDTO {
     private Long id;
     private String text;
-    private LocalDateTime creationDate;
+    private OffsetDateTime creationDate;
     private UserDTO createdBy;
     private Long topicId;
 
@@ -27,14 +28,6 @@ public class CommentTopicDTO {
         this.text = text;
     }
 
-    public LocalDateTime getCreationDate() {
-        return creationDate;
-    }
-
-    public void setCreationDate(LocalDateTime creationDate) {
-        this.creationDate = creationDate;
-    }
-
     public Long getTopicId() {
         return topicId;
     }
@@ -49,5 +42,13 @@ public class CommentTopicDTO {
 
     public void setCreatedBy(UserDTO createdBy) {
         this.createdBy = createdBy;
+    }
+
+    public OffsetDateTime getCreationDate() {
+        return creationDate;
+    }
+
+    public void setCreationDate(OffsetDateTime creationDate) {
+        this.creationDate = creationDate;
     }
 }
