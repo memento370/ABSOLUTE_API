@@ -141,7 +141,7 @@ public class UserController {
             return ResponseEntity.ok(result);
         } catch (MailSendException e) {
             System.out.println(e.getMessage());
-            return ResponseEntity.badRequest().body("Введён некоректный e-mail");
+            return ResponseEntity.badRequest().body("Некоректний e-mail");
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }

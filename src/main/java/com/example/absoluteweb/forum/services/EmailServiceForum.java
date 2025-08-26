@@ -33,8 +33,8 @@ public class EmailServiceForum {
         // Створення листа
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(toEmail);
-        message.setSubject("Подтверждение востановления пароля на форуме L2 Absolute");
-        message.setText("Код подтверждения востановления пароля на форуме L2 Absolute : "+verificationCode);
+        message.setSubject("Підтвердження зміни паролю на форумі L2 Absolute");
+        message.setText("Код підтвердження зміни паролю на форумі L2 Absolute : "+verificationCode);
         // Відправка
         mailSender.send(message);
 
