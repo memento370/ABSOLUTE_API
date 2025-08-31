@@ -23,19 +23,18 @@ public class PatchController {
 
     @GetMapping("/**")
     public ResponseEntity<?> getFile(HttpServletRequest request) {
+        String fullPath = request.getRequestURI().replace("/api/files/", "");
         try{
-            // Отримуємо повний шлях після "/files/"
-            String fullPath = request.getRequestURI().replace("/api/files/", "");
             Resource fileResource = patchService.loadAsResource(fullPath);
             String contentType = "application/octet-stream";
             return ResponseEntity.ok()
                     .contentType(MediaType.parseMediaType(contentType))
                     .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileResource.getFilename() + "\"")
                     .body(fileResource);
-        } catch (FileNotFoundException e) {
+        }catch (FileNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Patch exception : " + e.getMessage());
+        } catch (Throwable t) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(fullPath + " помилка");
         }
     }
 }
