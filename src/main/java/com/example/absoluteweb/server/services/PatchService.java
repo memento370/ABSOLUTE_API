@@ -17,7 +17,7 @@ public class PatchService {
     /**
      * Завантаження файлу як ресурсу для повернення в HTTP-відповіді.
      */
-    public Resource loadAsResource(String filename) {
+    public Resource loadAsResource(String filename) throws Exception {
         try {
             Path file = rootLocation.resolve(filename).normalize();
             Resource resource = new UrlResource(file.toUri());
@@ -26,10 +26,8 @@ public class PatchService {
             } else {
                 throw new RuntimeException("Файл не знайдено або недоступний: " + filename);
             }
-        } catch (MalformedURLException e) {
-            throw new RuntimeException("Помилка в URL файлу: " + filename, e);
         } catch (Exception e) {
-            throw new RuntimeException("Помилка файлу: " + filename, e);
+            throw new Exception("Помилка файлу: " + filename, e);
         }
     }
 }
