@@ -3,6 +3,8 @@ package com.example.absoluteweb.server.services;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
+
+import java.io.FileNotFoundException;
 import java.net.MalformedURLException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -24,10 +26,10 @@ public class PatchService {
             if (resource.exists() && resource.isReadable()) {
                 return resource;
             } else {
-                throw new RuntimeException("Файл не знайдено або недоступний: " + filename);
+                throw new FileNotFoundException("File not found : "+filename);
             }
         } catch (Exception e) {
-            throw new Exception("Помилка файлу: " + filename, e);
+            throw new Exception("Exception get file : "+filename);
         }
     }
 }

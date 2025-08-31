@@ -30,7 +30,7 @@ public class PatchController {
                     .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileResource.getFilename() + "\"")
                     .body(fileResource);
         }catch (Exception e){
-            return ResponseEntity.badRequest().body("Patch exception : "+ e.getMessage());
+            return ResponseEntity.badRequest().body("Patch exception : " + e.getMessage());
         }
     }
 }
