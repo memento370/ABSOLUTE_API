@@ -19,16 +19,19 @@ public class PatchController {
     }
 
     @GetMapping("/**")
-    public ResponseEntity<Resource> getFile(HttpServletRequest request) {
+    public ResponseEntity<?> getFile(HttpServletRequest request) {
         // Отримуємо повний шлях після "/files/"
         String fullPath = request.getRequestURI().replace("/api/files/", "");
         Resource fileResource = patchService.loadAsResource(fullPath);
 
         String contentType = "application/octet-stream";
-
-        return ResponseEntity.ok()
-                .contentType(MediaType.parseMediaType(contentType))
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileResource.getFilename() + "\"")
-                .body(fileResource);
+        try{
+            return ResponseEntity.ok()
+                    .contentType(MediaType.parseMediaType(contentType))
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileResource.getFilename() + "\"")
+                    .body(fileResource);
+        }catch (Exception e){
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 }

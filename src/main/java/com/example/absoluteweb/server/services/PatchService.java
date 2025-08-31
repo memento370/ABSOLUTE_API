@@ -28,6 +28,8 @@ public class PatchService {
             }
         } catch (MalformedURLException e) {
             throw new RuntimeException("Помилка в URL файлу: " + filename, e);
+        } catch (Exception e) {
+            throw new RuntimeException("Помилка файлу: " + filename, e);
         }
     }
 }
