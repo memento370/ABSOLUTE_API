@@ -28,8 +28,8 @@ public class PatchService {
             } else {
                 throw new FileNotFoundException("File not found : "+filename);
             }
-        }catch (MalformedURLException e) {
-            throw new FileNotFoundException(filename);
+        }catch (Exception e){
+            throw new Exception(e);
         }
     }
 }
