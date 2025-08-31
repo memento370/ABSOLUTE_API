@@ -20,7 +20,7 @@ public class PatchService {
      * Завантаження файлу як ресурсу для повернення в HTTP-відповіді.
      */
     public Resource loadAsResource(String filename) throws Exception {
-        try {
+
             Path file = rootLocation.resolve(filename).normalize();
             Resource resource = new UrlResource(file.toUri());
             if (resource.exists() && resource.isReadable()) {
@@ -28,8 +28,6 @@ public class PatchService {
             } else {
                 throw new FileNotFoundException("File not found : "+filename);
             }
-        }catch (Exception e){
-            throw new Exception(e);
-        }
+
     }
 }

@@ -83,7 +83,6 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(Arrays.asList(
                 "https://l2-absolute.com",
-                "https://www.l2-absolute.com",
                 "https://152.53.125.216:8081",
                 "https://152.53.125.216:8080",
                 "https://152.53.125.216:587",
