@@ -1,18 +1,29 @@
 package com.example.absoluteweb.site.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
 @Entity
-@Table(name = "accounts")
+@Table(name = "accounts", uniqueConstraints = {
+        @UniqueConstraint(columnNames = "login"),
+        @UniqueConstraint(columnNames = "l2email")
+})
 public class SiteAccounts {
     @Id
     @Column(name = "login")
+    @NotBlank(message = "site.login.required")
+    @Size(max = 14, message = "site.login.max.length")
     private String login;
 
     @Column(name = "password")
+    @NotBlank(message = "site.password.required")
     private String password;
 
     @Column(name = "l2email")
+    @NotBlank(message = "site.l2email.required")
+    @Email(message = "site.l2email.invalid")
     private String l2email;
 
     private String role;

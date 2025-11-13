@@ -7,17 +7,26 @@ import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
+import java.util.Base64;
 import java.util.Date;
 
 @Component
 public class JwtUtils {
 
-    // Генерація секретного ключа для підпису. Зазвичай зберігається у безпечному місці (Vault, налаштуваннях тощо).
-    private final Key key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
-    private final Key keyForum = Keys.secretKeyFor(SignatureAlgorithm.HS256);
+    private final Key key;
+    private final Key keyForum;
+
+    public JwtUtils(
+            @Value("${jwt.secret}") String secretBase64,
+            @Value("${jwt.secret.forum}") String secretForumBase64
+    ) {
+        this.key = Keys.hmacShaKeyFor(Base64.getDecoder().decode(secretBase64));
+        this.keyForum = Keys.hmacShaKeyFor(Base64.getDecoder().decode(secretForumBase64));
+    }
 
     public String generateToken(String username, String role) {
         // Приклад: токен з `sub` = username, додатковим "role" і строком дії 1 година
@@ -40,13 +49,13 @@ public class JwtUtils {
         }
     }
 
-    public String getUsernameFromToken(String token) {
+    public String getAccountLoginFromToken(String token) {
         Claims claims = Jwts.parserBuilder().setSigningKey(key).build()
                 .parseClaimsJws(token).getBody();
         return claims.getSubject();
     }
 
-    public String getRoleFromToken(String token) {
+    public String getAccountRoleFromToken(String token) {
         Claims claims = Jwts.parserBuilder().setSigningKey(key).build()
                 .parseClaimsJws(token).getBody();
         return claims.get("role", String.class);

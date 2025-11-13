@@ -87,7 +87,8 @@ public class SecurityConfig {
                 "https://152.53.125.216:8080",
                 "https://152.53.125.216:587",
                 "https://localhost:8080",
-                "https://localhost:4200"
+                "https://localhost:4200",
+                "http://localhost:4200"
         ));
 
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));

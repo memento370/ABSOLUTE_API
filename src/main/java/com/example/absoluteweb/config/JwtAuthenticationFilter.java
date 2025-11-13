@@ -1,5 +1,7 @@
 package com.example.absoluteweb.config;
 
+import com.example.absoluteweb.forum.principals.UserPrincipal;
+import com.example.absoluteweb.site.principals.AccountPrincipal;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -29,19 +31,30 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String token = authHeader.substring(7);
             if (jwtUtils.validateToken(token)) {
-                // Отримуємо username та роль
-                String username = jwtUtils.getUsernameFromToken(token);
-                String role = jwtUtils.getRoleFromToken(token);
+//                // Отримуємо username та роль
+//                String username = jwtUtils.getUsernameFromToken(token);
+//                String role = jwtUtils.getRoleFromToken(token);
+//
+//                // Створюємо Authentication об’єкт
+//                UsernamePasswordAuthenticationToken authentication =
+//                        new UsernamePasswordAuthenticationToken(
+//                                username,
+//                                null,
+//                                Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + role))
+//                        );
+//
+//                // Прописуємо в контекст
+//                SecurityContextHolder.getContext().setAuthentication(authentication);
 
-                // Створюємо Authentication об’єкт
+                String nick = jwtUtils.getAccountLoginFromToken(token);
+                String role = jwtUtils.getAccountRoleFromToken(token);
+
+                AccountPrincipal principal = new AccountPrincipal(nick, role);
+
                 UsernamePasswordAuthenticationToken authentication =
                         new UsernamePasswordAuthenticationToken(
-                                username,
-                                null,
-                                Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + role))
-                        );
+                                principal, null, principal.getAuthorities());
 
-                // Прописуємо в контекст
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
         }
