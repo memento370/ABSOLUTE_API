@@ -31,20 +31,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String token = authHeader.substring(7);
             if (jwtUtils.validateToken(token)) {
-//                // Отримуємо username та роль
-//                String username = jwtUtils.getUsernameFromToken(token);
-//                String role = jwtUtils.getRoleFromToken(token);
-//
-//                // Створюємо Authentication об’єкт
-//                UsernamePasswordAuthenticationToken authentication =
-//                        new UsernamePasswordAuthenticationToken(
-//                                username,
-//                                null,
-//                                Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + role))
-//                        );
-//
-//                // Прописуємо в контекст
-//                SecurityContextHolder.getContext().setAuthentication(authentication);
 
                 String nick = jwtUtils.getAccountLoginFromToken(token);
                 String role = jwtUtils.getAccountRoleFromToken(token);

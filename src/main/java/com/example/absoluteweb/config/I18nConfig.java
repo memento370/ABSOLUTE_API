@@ -24,8 +24,8 @@ public class I18nConfig {
         ResourceBundleMessageSource messageSource = new ResourceBundleMessageSource();
         messageSource.setBasenames(
                 "messages/site/messages",   // Для сайту: messages/site/messages_uk.properties тощо
-                "messages/server/messages", // Для сервера
-                "messages/forum/messages"   // Для форуму
+                "messages/server/messages" // Для сервера
+//                "messages/forum/messages"   // Для форуму
         );
         messageSource.setDefaultEncoding("UTF-8");
         messageSource.setUseCodeAsDefaultMessage(true); // Повертає код, якщо не знайдено (для дебагу)
