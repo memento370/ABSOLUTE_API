@@ -89,7 +89,8 @@ public class SecurityConfig {
                                 "/api/site/accounts/check-register",
                                 "/api/site/accounts/send-verification",
                                 "/api/site/accounts/verify-code",
-                                "/api/site/accounts/login"
+                                "/api/site/accounts/login",
+                                "/api/files/**"
 
                         ).permitAll()
                         .anyRequest().authenticated()
