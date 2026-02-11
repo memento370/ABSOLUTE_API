@@ -79,9 +79,21 @@ public class SecurityConfig {
 //    }
 
     @Bean
+    @Order(0)
+    public SecurityFilterChain filesChain(HttpSecurity http) throws Exception {
+        http.securityMatcher("/api/files/**")
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .csrf(csrf -> csrf.disable())
+                .authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
+                .addFilterBefore(rateLimitingFilter, UsernamePasswordAuthenticationFilter.class);
+
+        return http.build();
+    }
+
+    @Bean
     @Order(1)
     public SecurityFilterChain siteFilterChain(HttpSecurity http) throws Exception {
-        http.securityMatcher("/api/site/**", "/api/server/**", "/api/files/**")  // Matcher для шляхів сайту
+        http.securityMatcher("/api/site/**", "/api/server/**")  // Matcher для шляхів сайту
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
@@ -90,7 +102,6 @@ public class SecurityConfig {
                                 "/api/site/accounts/send-verification",
                                 "/api/site/accounts/verify-code",
                                 "/api/site/accounts/login",
-                                "/api/files/**"
 
                         ).permitAll()
                         .anyRequest().authenticated()
