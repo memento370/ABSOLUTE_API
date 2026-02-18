@@ -11,11 +11,13 @@ public class CharacterDTO {
     private int baseClassId;
     private String raceEn;
     private String raceRu;
+    private String raceUk;
     private String classEn;
     private String classRu;
+    private String classUk;
     private int lvl;
 
-    public CharacterDTO(int objId, String accountName,String charName, int baseClassId, String raceEn, String raceRu, String classEn, String classRu,int lvl) {
+    public CharacterDTO(int objId, String accountName,String charName, int baseClassId, String raceEn, String raceRu,String raceUk, String classEn, String classRu,String classUk,int lvl) {
         this.objId = objId;
         this.accountName = accountName;
         this.charName = charName;
@@ -96,5 +98,21 @@ public class CharacterDTO {
 
     public void setLvl(int lvl) {
         this.lvl = lvl;
+    }
+
+    public String getRaceUk() {
+        return raceUk;
+    }
+
+    public void setRaceUk(String raceUk) {
+        this.raceUk = raceUk;
+    }
+
+    public String getClassUk() {
+        return classUk;
+    }
+
+    public void setClassUk(String classUk) {
+        this.classUk = classUk;
     }
 }
