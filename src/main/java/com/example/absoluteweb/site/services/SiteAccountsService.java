@@ -97,6 +97,7 @@ public class SiteAccountsService {
         response.put("token", token);
         response.put("role", user.getRole());
         response.put("login", user.getLogin());
+        response.put("email", user.getL2email());
         response.put("message", messageSource.getMessage("site.login.success", null, locale));
 
         return ResponseEntity.ok(response);
