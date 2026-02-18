@@ -102,8 +102,6 @@ public class ServerAccountsService {
                     level
             );
             characterDTOs.add(dto);
-            System.out.println(level);
-
         }
         return ResponseEntity.ok(characterDTOs);
     }

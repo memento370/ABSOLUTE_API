@@ -76,7 +76,6 @@ public class UserController {
             String result = userService.sendVerificationCode(email);
             return ResponseEntity.ok(result);
         } catch (MailSendException e) {
-            System.out.println(e.getMessage());
             return ResponseEntity.badRequest().body("Введён некоректный e-mail");
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -140,7 +139,6 @@ public class UserController {
             String result = userService.sendVerificationCodeRestore(email);
             return ResponseEntity.ok(result);
         } catch (MailSendException e) {
-            System.out.println(e.getMessage());
             return ResponseEntity.badRequest().body("Некоректний e-mail");
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
