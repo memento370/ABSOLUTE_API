@@ -3,11 +3,14 @@ package com.example.absoluteweb.site.services;
 import com.example.absoluteweb.config.JwtUtils;
 import com.example.absoluteweb.server.DTO.ServerRegistrationRequest;
 import com.example.absoluteweb.server.services.ServerAccountsService;
+import com.example.absoluteweb.site.DTO.EmailChangeConfirmDTO;
 import com.example.absoluteweb.site.DTO.SiteRegistrationRequest;
 import com.example.absoluteweb.site.DTO.SiteVerificationRequest;
 import com.example.absoluteweb.site.entity.SiteAccounts;
 import com.example.absoluteweb.site.exceptions.AccountExceptions;
+import com.example.absoluteweb.site.principals.AccountPrincipal;
 import com.example.absoluteweb.site.repository.SiteAccountsRep;
+import org.springframework.transaction.annotation.Transactional;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
@@ -26,6 +29,8 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.Security;
 import java.util.*;
+import org.springframework.transaction.annotation.Transactional;
+
 
 @Service
 public class SiteAccountsService {
@@ -161,5 +166,71 @@ public class SiteAccountsService {
         }
         return ResponseEntity.ok(messageSource.getMessage("site.checkregister.ok", null, locale));
     }
+
+    public ResponseEntity<?> requestEmailChangeCode(AccountPrincipal principal) throws AccountExceptions {
+        Locale locale = LocaleContextHolder.getLocale();
+        String login = principal.login();
+
+        SiteAccounts acc = siteAccountsRep.findByLogin(login);
+        if (acc == null) {
+            throw new AccountExceptions(messageSource.getMessage("site.email.change.account.notfound", null, locale));
+        }
+
+        String oldEmail = acc.getL2email();
+        if (oldEmail == null || oldEmail.isBlank()) {
+            throw new AccountExceptions(messageSource.getMessage("site.email.change.oldEmail.missing", null, locale));
+        }
+
+        String code = emailService.sendEmailChangeVerification(oldEmail);
+        verificationCodeService.saveEmailChangeCode(oldEmail, code);
+
+        return ResponseEntity.ok(messageSource.getMessage("site.email.change.request.ok", null, locale));
+    }
+
+    @Transactional(transactionManager = "siteTransactionManager")
+    public ResponseEntity<?> confirmEmailChange(AccountPrincipal principal, EmailChangeConfirmDTO dto) throws AccountExceptions {
+        Locale locale = LocaleContextHolder.getLocale();
+        String login = principal.login();
+
+        SiteAccounts acc = siteAccountsRep.findByLogin(login);
+        if (acc == null) {
+            throw new AccountExceptions(messageSource.getMessage("site.email.change.account.notfound", null, locale));
+        }
+
+        String oldEmail = acc.getL2email();
+        if (oldEmail == null || oldEmail.isBlank()) {
+            throw new AccountExceptions(messageSource.getMessage("site.email.change.oldEmail.missing", null, locale));
+        }
+
+        String newEmail = dto.getNewEmail();
+        String code = dto.getCode();
+
+        if (oldEmail.equalsIgnoreCase(newEmail)) {
+            throw new AccountExceptions(messageSource.getMessage("site.email.change.newEmail.sameAsOld", null, locale));
+        }
+
+        String cachedCode = verificationCodeService.getEmailChangeCode(oldEmail);
+        if (cachedCode == null || cachedCode.isBlank()) {
+            throw new AccountExceptions(messageSource.getMessage("site.email.change.code.expired", null, locale));
+        }
+
+        if (!cachedCode.equals(code)) {
+            throw new AccountExceptions(messageSource.getMessage("site.email.change.code.invalid", null, locale));
+        }
+
+        SiteAccounts byEmail = siteAccountsRep.findByL2email(newEmail);
+        if (byEmail != null) {
+            throw new AccountExceptions(messageSource.getMessage("site.email.change.newEmail.inUse", null, locale));
+        }
+
+        acc.setL2email(newEmail);
+        siteAccountsRep.save(acc);
+        verificationCodeService.deleteEmailChangeCode(oldEmail);
+
+        return ResponseEntity.ok(messageSource.getMessage("site.email.change.confirm.ok", null, locale));
+    }
+
+
+
 
 }

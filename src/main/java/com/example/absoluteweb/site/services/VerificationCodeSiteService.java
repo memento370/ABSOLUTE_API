@@ -23,6 +23,20 @@ public class VerificationCodeSiteService {
 
     // Видаляємо код після успішної перевірки
     @CacheEvict(value = "verificationCodes", key = "#email")
-    public void deleteCode(String email) {
+    public void deleteCode(String email) {  }
+
+    // ====== Зміна email (окремий кеш, щоб не було колізій) ======
+    @CachePut(value = "emailChangeCodes", key = "#oldEmail")
+    public String saveEmailChangeCode(String oldEmail, String code) {
+        return code;
     }
+
+    @Cacheable(value = "emailChangeCodes", key = "#oldEmail", unless = "#result == null")
+    public String getEmailChangeCode(String oldEmail) {
+        return null;
+    }
+
+    @CacheEvict(value = "emailChangeCodes", key = "#oldEmail")
+    public void deleteEmailChangeCode(String oldEmail) { }
+
 }

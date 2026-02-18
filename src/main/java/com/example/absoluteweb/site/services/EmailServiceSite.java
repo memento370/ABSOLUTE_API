@@ -34,4 +34,21 @@ public class EmailServiceSite {
         mailSender.send(message);
         return verificationCode; // Повертаємо код для подальшої перевірки
     }
+
+    public String sendEmailChangeVerification(String toEmail) {
+        String codeСhangeEmail = String.format("%06d", new Random().nextInt(999999));
+
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(toEmail);
+        message.setSubject("Підтвердження зміни e-mail");
+        message.setText(
+                "Ви запросили зміну e-mail на сайті L2 Absolute.\n\n" +
+                        "Код підтвердження: " + codeСhangeEmail + "\n\n" +
+                        "Якщо це були не ви — просто ігноруйте цей лист."
+        );
+
+        mailSender.send(message);
+        return codeСhangeEmail;
+    }
+
 }

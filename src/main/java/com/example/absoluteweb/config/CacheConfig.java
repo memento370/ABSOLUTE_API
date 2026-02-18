@@ -22,7 +22,7 @@ public class CacheConfig {
 
     @Bean
     public CacheManager cacheManager(Caffeine<Object, Object> caffeine) {
-        CaffeineCacheManager cacheManager = new CaffeineCacheManager("verificationCodes");
+        CaffeineCacheManager cacheManager = new CaffeineCacheManager("verificationCodes","emailChangeCodes");
         cacheManager.setCaffeine(caffeine);
         return cacheManager;
     }
