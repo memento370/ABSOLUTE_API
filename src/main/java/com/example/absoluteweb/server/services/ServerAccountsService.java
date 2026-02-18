@@ -84,11 +84,11 @@ public class ServerAccountsService {
             ClassLocalization localization = ClassLocalization.getByBaseClassId(character.getBaseClassId());
             String raceEn = localization != null ? localization.getRaceEn() : "Unknown";
             String raceRu = localization != null ? localization.getRaceRu() : "Неизвестно";
-            String raceUk = localization != null ? localization.getRaceRu() : "Невідомо";
+            String raceUk = localization != null ? localization.getRaceUk() : "Невідомо";
 
             String classEn = localization != null ? localization.getClassEn() : "Unknown";
             String classRu = localization != null ? localization.getClassRu() : "Неизвестно";
-            String classUk = localization != null ? localization.getClassRu() : "Неизвестно";
+            String classUk = localization != null ? localization.getClassUk() : "Невідомо";
 
 
             int level = characterSubclassesRep.findByCharObjId(character.getObjId())
