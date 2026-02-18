@@ -39,4 +39,38 @@ public class VerificationCodeSiteService {
     @CacheEvict(value = "emailChangeCodes", key = "#oldEmail")
     public void deleteEmailChangeCode(String oldEmail) { }
 
+    // ====== Login change ======
+    @CachePut(value = "loginChangeCodes", key = "#email")
+    public String saveLoginChangeCode(String email, String code) { return code; }
+
+    @Cacheable(value = "loginChangeCodes", key = "#email", unless = "#result == null")
+    public String getLoginChangeCode(String email) { return null; }
+
+    @CacheEvict(value = "loginChangeCodes", key = "#email")
+    public void deleteLoginChangeCode(String email) { }
+
+
+    // ====== Password change ======
+    @CachePut(value = "passwordChangeCodes", key = "#email")
+    public String savePasswordChangeCode(String email, String code) { return code; }
+
+    @Cacheable(value = "passwordChangeCodes", key = "#email", unless = "#result == null")
+    public String getPasswordChangeCode(String email) { return null; }
+
+    @CacheEvict(value = "passwordChangeCodes", key = "#email")
+    public void deletePasswordChangeCode(String email) { }
+
+    @CachePut(value = "passwordResetCodes", key = "#email")
+    public String savePasswordResetCode(String email, String code) {
+        return code;
+    }
+
+    @Cacheable(value = "passwordResetCodes", key = "#email")
+    public String getPasswordResetCode(String email) {
+        return null;
+    }
+
+    @CacheEvict(value = "passwordResetCodes", key = "#email")
+    public void deletePasswordResetCode(String email) {}
+
 }

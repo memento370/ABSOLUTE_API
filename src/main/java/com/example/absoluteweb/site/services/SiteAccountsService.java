@@ -3,9 +3,7 @@ package com.example.absoluteweb.site.services;
 import com.example.absoluteweb.config.JwtUtils;
 import com.example.absoluteweb.server.DTO.ServerRegistrationRequest;
 import com.example.absoluteweb.server.services.ServerAccountsService;
-import com.example.absoluteweb.site.DTO.EmailChangeConfirmDTO;
-import com.example.absoluteweb.site.DTO.SiteRegistrationRequest;
-import com.example.absoluteweb.site.DTO.SiteVerificationRequest;
+import com.example.absoluteweb.site.DTO.*;
 import com.example.absoluteweb.site.entity.SiteAccounts;
 import com.example.absoluteweb.site.exceptions.AccountExceptions;
 import com.example.absoluteweb.site.principals.AccountPrincipal;
@@ -97,7 +95,7 @@ public class SiteAccountsService {
         response.put("token", token);
         response.put("role", user.getRole());
         response.put("login", user.getLogin());
-        response.put("email", user.getL2email());
+        response.put("l2email", user.getL2email());
         response.put("message", messageSource.getMessage("site.login.success", null, locale));
 
         return ResponseEntity.ok(response);
@@ -231,6 +229,124 @@ public class SiteAccountsService {
         return ResponseEntity.ok(messageSource.getMessage("site.email.change.confirm.ok", null, locale));
     }
 
+    public ResponseEntity<?> remindLogin(AccountPrincipal principal) throws AccountExceptions {
+        Locale locale = LocaleContextHolder.getLocale();
+        String login = principal.login();
+
+        SiteAccounts acc = siteAccountsRep.findByLogin(login);
+        if (acc == null) {
+            throw new AccountExceptions(messageSource.getMessage("site.login.remind.account.notfound", null, locale));
+        }
+
+        String email = acc.getL2email();
+        if (email == null || email.isBlank()) {
+            throw new AccountExceptions(messageSource.getMessage("site.login.remind.email.missing", null, locale));
+        }
+
+        emailService.sendLoginReminder(email, login);
+
+        return ResponseEntity.ok(messageSource.getMessage("site.login.remind.ok", null, locale));
+    }
+
+    public ResponseEntity<?> requestPasswordChangeCode(AccountPrincipal principal) throws AccountExceptions {
+        Locale locale = LocaleContextHolder.getLocale();
+        String login = principal.login();
+
+        SiteAccounts acc = siteAccountsRep.findByLogin(login);
+        if (acc == null) {
+            throw new AccountExceptions(messageSource.getMessage("site.password.change.account.notfound", null, locale));
+        }
+
+        String email = acc.getL2email();
+        if (email == null || email.isBlank()) {
+            throw new AccountExceptions(messageSource.getMessage("site.password.change.email.missing", null, locale));
+        }
+
+        String code = emailService.sendPasswordChangeVerification(email);
+        verificationCodeService.savePasswordChangeCode(email, code);
+
+        return ResponseEntity.ok(messageSource.getMessage("site.password.change.request.ok", null, locale));
+    }
+
+    @Transactional(transactionManager = "siteTransactionManager")
+    public ResponseEntity<?> confirmPasswordChange(AccountPrincipal principal, PasswordChangeConfirmDTO dto) throws AccountExceptions {
+        Locale locale = LocaleContextHolder.getLocale();
+        String login = principal.login();
+
+        SiteAccounts acc = siteAccountsRep.findByLogin(login);
+        if (acc == null) {
+            throw new AccountExceptions(messageSource.getMessage("site.password.change.account.notfound", null, locale));
+        }
+
+        String email = acc.getL2email();
+        if (email == null || email.isBlank()) {
+            throw new AccountExceptions(messageSource.getMessage("site.password.change.email.missing", null, locale));
+        }
+
+        String newPassword = dto.getNewPassword().trim();
+        String code = dto.getCode().trim();
+
+        String cachedCode = verificationCodeService.getPasswordChangeCode(email);
+        if (cachedCode == null || cachedCode.isBlank()) {
+            throw new AccountExceptions(messageSource.getMessage("site.password.change.code.expired", null, locale));
+        }
+
+        if (!cachedCode.equals(code)) {
+            throw new AccountExceptions(messageSource.getMessage("site.password.change.code.invalid", null, locale));
+        }
+
+        acc.setPassword(passwordEncoder.encode(newPassword));
+        siteAccountsRep.save(acc);
+        serverAccountsService.changePasswordInternal(acc.getLogin(), newPassword);
+
+        verificationCodeService.deletePasswordChangeCode(email);
+
+        return ResponseEntity.ok(messageSource.getMessage("site.password.change.confirm.ok", null, locale));
+    }
+
+    public ResponseEntity<?> requestPasswordReset(PasswordResetRequestDTO dto) throws AccountExceptions {
+        Locale locale = LocaleContextHolder.getLocale();
+        String email = dto.getEmail().trim();
+        SiteAccounts acc = siteAccountsRep.findByL2email(email);
+
+        if (acc != null) {
+            String login = acc.getLogin();
+            String code = emailService.sendPasswordResetEmail(email, login);
+            verificationCodeService.savePasswordResetCode(email, code);
+        }
+
+        return ResponseEntity.ok(messageSource.getMessage("site.password.reset.request.ok", null, locale));
+    }
+
+    @Transactional(transactionManager = "siteTransactionManager")
+    public ResponseEntity<?> confirmPasswordReset(PasswordResetConfirmDTO dto) throws AccountExceptions {
+        Locale locale = LocaleContextHolder.getLocale();
+
+        String email = dto.getEmail().trim();
+        String code = dto.getCode().trim();
+        String newPassword = dto.getNewPassword();
+
+        SiteAccounts acc = siteAccountsRep.findByL2email(email);
+        if (acc == null) {
+            throw new AccountExceptions(messageSource.getMessage("site.password.reset.code.invalid", null, locale));
+        }
+
+        String cachedCode = verificationCodeService.getPasswordResetCode(email);
+        if (cachedCode == null || cachedCode.isBlank()) {
+            throw new AccountExceptions(messageSource.getMessage("site.password.reset.code.expired", null, locale));
+        }
+        if (!cachedCode.equals(code)) {
+            throw new AccountExceptions(messageSource.getMessage("site.password.reset.code.invalid", null, locale));
+        }
+
+        acc.setPassword(passwordEncoder.encode(newPassword));
+        siteAccountsRep.save(acc);
+
+        serverAccountsService.changePasswordInternal(acc.getLogin(), newPassword);
+        verificationCodeService.deletePasswordResetCode(email);
+
+        return ResponseEntity.ok(messageSource.getMessage("site.password.reset.confirm.ok", null, locale));
+    }
 
 
 

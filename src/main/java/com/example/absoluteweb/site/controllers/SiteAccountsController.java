@@ -112,4 +112,69 @@ public class SiteAccountsController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+
+    @PostMapping("/login/remind")
+    public ResponseEntity<?> remindLogin(@AuthenticationPrincipal AccountPrincipal principal) {
+        try {
+            return siteAccountsService.remindLogin(principal);
+        } catch (AccountExceptions e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @PostMapping("/password-change/request")
+    public ResponseEntity<?> requestPasswordChangeCode(@AuthenticationPrincipal AccountPrincipal principal) {
+        try {
+            return siteAccountsService.requestPasswordChangeCode(principal);
+        } catch (AccountExceptions e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @PostMapping("/password-change/confirm")
+    public ResponseEntity<?> confirmPasswordChange(
+            @AuthenticationPrincipal AccountPrincipal principal,
+            @Valid @RequestBody PasswordChangeConfirmDTO dto,
+            BindingResult br
+    ) {
+        if (br.hasErrors()) {
+            String msg = br.getFieldErrors().get(0).getDefaultMessage();
+            return ResponseEntity.badRequest().body(msg);
+        }
+        try {
+            return siteAccountsService.confirmPasswordChange(principal, dto);
+        } catch (AccountExceptions e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @PostMapping("/password-reset/request")
+    public ResponseEntity<?> requestPasswordReset(
+            @Valid @RequestBody PasswordResetRequestDTO dto,
+            BindingResult br
+    ) {
+        if (br.hasErrors()) {
+            return ResponseEntity.badRequest().body(br.getFieldErrors().get(0).getDefaultMessage());
+        }
+        try {
+            return siteAccountsService.requestPasswordReset(dto);
+        } catch (AccountExceptions e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @PostMapping("/password-reset/confirm")
+    public ResponseEntity<?> confirmPasswordReset(
+            @Valid @RequestBody PasswordResetConfirmDTO dto,
+            BindingResult br
+    ) {
+        if (br.hasErrors()) {
+            return ResponseEntity.badRequest().body(br.getFieldErrors().get(0).getDefaultMessage());
+        }
+        try {
+            return siteAccountsService.confirmPasswordReset(dto);
+        } catch (AccountExceptions e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
 }

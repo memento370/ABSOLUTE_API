@@ -51,4 +51,64 @@ public class EmailServiceSite {
         return codeСhangeEmail;
     }
 
+    public void sendLoginReminder(String toEmail, String login) {
+        Locale locale = LocaleContextHolder.getLocale();
+
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(toEmail);
+        message.setSubject(messageSource.getMessage("site.email.login.remind.subject", null, locale));
+
+        String body =
+                messageSource.getMessage("site.email.login.remind.body.prefix", null, locale)
+                        + login
+                        + "\n\n"
+                        + messageSource.getMessage("site.email.send.confirm.03", null, locale)
+                        + messageSource.getMessage("site.email.send.confirm.04", null, locale);
+
+        message.setText(body);
+
+        mailSender.send(message);
+    }
+
+    public String sendPasswordChangeVerification(String toEmail) {
+        // Генерація 6-значного коду (окремо для зміни паролю)
+        String verificationCode = String.format("%06d", new Random().nextInt(999999));
+        Locale locale = LocaleContextHolder.getLocale();
+
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(toEmail);
+        message.setSubject(messageSource.getMessage("site.email.password.change.subject", null, locale));
+        message.setText(
+                messageSource.getMessage("site.email.password.change.body.prefix", null, locale)
+                        + verificationCode
+                        + "\n\n"
+                        + messageSource.getMessage("site.email.send.confirm.03", null, locale)
+                        + messageSource.getMessage("site.email.send.confirm.04", null, locale)
+        );
+
+        mailSender.send(message);
+        return verificationCode;
+    }
+
+    public String sendPasswordResetEmail(String toEmail, String login) {
+        String code = String.format("%06d", new Random().nextInt(999999));
+        Locale locale = LocaleContextHolder.getLocale();
+
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(toEmail);
+        message.setSubject(messageSource.getMessage("site.email.password.reset.subject", null, locale));
+
+        String body =
+                messageSource.getMessage("site.email.password.reset.body.login", new Object[]{login}, locale)
+                        + "\n"
+                        + messageSource.getMessage("site.email.password.reset.body.code", new Object[]{code}, locale)
+                        + "\n\n"
+                        + messageSource.getMessage("site.email.send.confirm.03", null, locale)
+                        + messageSource.getMessage("site.email.send.confirm.04", null, locale);
+
+        message.setText(body);
+
+        mailSender.send(message);
+        return code;
+    }
 }

@@ -102,10 +102,8 @@ public class SecurityConfig {
                                 "/api/site/accounts/send-verification",
                                 "/api/site/accounts/verify-code",
                                 "/api/site/accounts/login",
-                                "/api/site/email-change/request",
-                                "/api/site/email-change/confirm"
-
-
+                                "api/site/accounts/password-reset/request",
+                                "api/site/accounts/password-reset/confirm"
 
                                 ).permitAll()
                         .anyRequest().authenticated()

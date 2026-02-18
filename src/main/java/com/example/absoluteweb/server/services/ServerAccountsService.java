@@ -106,4 +106,24 @@ public class ServerAccountsService {
         return ResponseEntity.ok(characterDTOs);
     }
 
+    public void changePasswordInternal(String login, String newPassword) throws AccountExceptions {
+        Accounts acc = serverAccountsRep.findByLogin(login);
+        if (acc == null) {
+            throw new AccountExceptions("Game account not found: " + login);
+        }
+        try {
+            if (Security.getProvider(BouncyCastleProvider.PROVIDER_NAME) == null) {
+                Security.addProvider(new BouncyCastleProvider());
+            }
+            MessageDigest md = MessageDigest.getInstance("WHIRLPOOL", "BC");
+            byte[] hashBytes = md.digest(newPassword.getBytes(StandardCharsets.UTF_8));
+            String encodedPassword = Base64.getEncoder().encodeToString(hashBytes);
+
+            acc.setPassword(encodedPassword);
+            serverAccountsRep.save(acc);
+        } catch (Exception ex) {
+            throw new AccountExceptions("Game password update error");
+        }
+    }
+
 }
