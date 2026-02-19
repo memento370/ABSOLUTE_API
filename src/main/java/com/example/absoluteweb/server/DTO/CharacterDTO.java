@@ -24,8 +24,10 @@ public class CharacterDTO {
         this.baseClassId = baseClassId;
         this.raceEn = raceEn;
         this.raceRu = raceRu;
+        this.raceUk = raceUk;
         this.classEn = classEn;
         this.classRu = classRu;
+        this.classUk = classUk;
         this.lvl = lvl;
     }
 
