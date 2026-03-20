@@ -38,46 +38,6 @@ public class SecurityConfig {
     @Autowired
     private RateLimitingFilter rateLimitingFilter;
 
-//    @Bean
-//    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-//        http.cors(cors -> cors.configurationSource(corsConfigurationSource()))
-//                .authorizeHttpRequests(auth -> auth
-//                        .requestMatchers(
-//                                "/api/site/accounts/register",
-//                                "/api/server/accounts/register",
-//                                "/api/site/accounts/check-register",
-//                                "/api/site/accounts/send-verification",
-//                                "/api/site/accounts/verify-code",
-//                                "/api/site/accounts/login",
-//                                "/api/files/**",
-//                                "/api/forum/user/create-user",
-//                                "/api/forum/user/check-register",
-//                                "/api/forum/user/send-verification",
-//                                "/api/forum/user/verify-code",
-//                                "/api/forum/user/login",
-//                                "/api/forum/user/send-verification-restore",
-//                                "/api/forum/user/verify-code-restore",
-//                                "/api/forum/user/restore-password",
-//                                "/api/forum/user/check-token",
-//                                "/api/forum/user/get-user/{id}",
-//                                "/api/forum/user/check-user-token",
-//                                "/api/forum/topic/by-section/{section}",
-//                                "/api/forum/topic/{id}",
-//                                "/api/forum/comment-topic/{topicId}",
-//                                "/api/forum/topic/by-section/**").permitAll()
-//                        .requestMatchers("/index.html", "/static/**", "/favicon.ico").permitAll()
-//                        .anyRequest().authenticated()
-//                )
-//                .httpBasic(Customizer.withDefaults())
-//                .csrf(csrf -> csrf.disable());
-//        http.addFilterBefore(rateLimitingFilter, UsernamePasswordAuthenticationFilter.class);
-//        http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
-//        http.addFilterBefore(jwtAuthenticationFilterForum, UsernamePasswordAuthenticationFilter.class);
-//
-//
-//        return http.build();
-//    }
-
     @Bean
     @Order(0)
     public SecurityFilterChain filesChain(HttpSecurity http) throws Exception {
@@ -103,9 +63,11 @@ public class SecurityConfig {
                                 "/api/site/accounts/verify-code",
                                 "/api/site/accounts/login",
                                 "api/site/accounts/password-reset/request",
-                                "api/site/accounts/password-reset/confirm"
+                                "api/site/accounts/password-reset/confirm",
+                                "/api/server/accounts/getOnline"
 
-                                ).permitAll()
+
+                ).permitAll()
                         .anyRequest().authenticated()
                 )
                 .httpBasic(Customizer.withDefaults())

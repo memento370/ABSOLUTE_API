@@ -34,5 +34,4 @@ public class ServerAccountsController {
     public int getOnline(){
         return accountsService.getOnline();
     }
-
 }
