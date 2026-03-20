@@ -9,4 +9,6 @@ import java.util.List;
 @Repository
 public interface GameCharacterRep extends JpaRepository<GameCharacter, Integer> {
     List<GameCharacter> findByAccountName(String accountName);
+
+    int countByOnline(int online);
 }

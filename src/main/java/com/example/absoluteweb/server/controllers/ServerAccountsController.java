@@ -25,23 +25,14 @@ public class ServerAccountsController {
         this.accountsService = accountsService;
     }
 
-//    @PostMapping("/register")
-//    private ResponseEntity createAccount(@RequestBody SiteRegistrationRequest regAcc) {
-//        try {
-//            accountsService.createAccaunt(regAcc);
-//            return ResponseEntity.ok("Акаунт зарегистрирован на сервере");
-//        }
-//        catch (AccountExceptions e){
-//            return ResponseEntity.badRequest().body(e.getMessage());
-//        }
-//    }
-
     @PostMapping("/characters")
     public ResponseEntity<List<CharacterDTO>> getCharacters(@AuthenticationPrincipal AccountPrincipal account) {
         return accountsService.getCharacters(account.getUsername());
     }
 
-
-
+    @GetMapping("/getOnline")
+    public int getOnline(){
+        return accountsService.getOnline();
+    }
 
 }

@@ -134,4 +134,8 @@ public class ServerAccountsService {
         }
     }
 
+    public int getOnline(){
+        return gameCharacterRep.countByOnline(1);
+    }
+
 }
