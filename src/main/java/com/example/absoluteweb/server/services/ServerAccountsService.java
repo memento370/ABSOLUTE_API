@@ -1,12 +1,14 @@
 package com.example.absoluteweb.server.services;
 
 import com.example.absoluteweb.server.DTO.CharacterDTO;
+import com.example.absoluteweb.server.DTO.TopClanDTO;
 import com.example.absoluteweb.server.DTO.TopPkPlayerDTO;
 import com.example.absoluteweb.server.DTO.TopPvpPlayerDTO;
 import com.example.absoluteweb.server.entity.Accounts;
 import com.example.absoluteweb.server.entity.GameCharacter;
 import com.example.absoluteweb.server.enums.ClassLocalization;
 import com.example.absoluteweb.server.repository.CharacterSubclassesRep;
+import com.example.absoluteweb.server.repository.ClanRepository;
 import com.example.absoluteweb.server.repository.GameCharacterRep;
 import com.example.absoluteweb.server.repository.ServerAccountsRep;
 import com.example.absoluteweb.site.DTO.SiteRegistrationRequest;
@@ -32,15 +34,17 @@ public class ServerAccountsService {
     private final CharacterSubclassesRep characterSubclassesRep;
 
     private final PasswordEncoder passwordEncoder;
-
+    private final ClanRepository clanRepository;
 
     @Autowired
     public ServerAccountsService(ServerAccountsRep serverAccountsRep, GameCharacterRep gameCharacterRep,
-                                 PasswordEncoder passwordEncoder,CharacterSubclassesRep characterSubclassesRep ) {
+                                 PasswordEncoder passwordEncoder, CharacterSubclassesRep characterSubclassesRep,
+                                 ClanRepository clanRepository) {
         this.serverAccountsRep = serverAccountsRep;
         this.gameCharacterRep = gameCharacterRep;
         this.passwordEncoder = passwordEncoder;
         this.characterSubclassesRep = characterSubclassesRep;
+        this.clanRepository = clanRepository;
     }
 
 
@@ -164,6 +168,19 @@ public class ServerAccountsService {
                     character.getCharName(),
                     character.getPkKills()
             ));
+        }
+
+        return ResponseEntity.ok(dtos);
+    }
+
+    public ResponseEntity<List<TopClanDTO>> getTopClans() {
+        List<Object[]> rows = clanRepository.findTop10ClansRaw();
+
+        List<TopClanDTO> dtos = new ArrayList<>();
+        for (Object[] row : rows) {
+            String clanName = (String) row[0];
+            Integer reputation = (Integer) row[1];
+            dtos.add(new TopClanDTO(clanName, reputation));
         }
 
         return ResponseEntity.ok(dtos);
