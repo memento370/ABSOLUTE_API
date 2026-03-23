@@ -1,6 +1,8 @@
 package com.example.absoluteweb.server.services;
 
 import com.example.absoluteweb.server.DTO.CharacterDTO;
+import com.example.absoluteweb.server.DTO.TopPkPlayerDTO;
+import com.example.absoluteweb.server.DTO.TopPvpPlayerDTO;
 import com.example.absoluteweb.server.entity.Accounts;
 import com.example.absoluteweb.server.entity.GameCharacter;
 import com.example.absoluteweb.server.enums.ClassLocalization;
@@ -136,6 +138,35 @@ public class ServerAccountsService {
 
     public int getOnline(){
         return gameCharacterRep.countByOnline(1);
+    }
+
+    public ResponseEntity<List<TopPvpPlayerDTO>> getTopPvpPlayers() {
+        List<GameCharacter> characters = gameCharacterRep.findTop8ByOrderByPvpKillsDesc();
+
+        List<TopPvpPlayerDTO> dtos = new ArrayList<>();
+        for (GameCharacter character : characters) {
+            dtos.add(new TopPvpPlayerDTO(
+                    character.getCharName(),
+                    character.getPvpKills()
+            ));
+        }
+
+        return ResponseEntity.ok(dtos);
+    }
+
+
+    public ResponseEntity<List<TopPkPlayerDTO>> getTopPkPlayers() {
+        List<GameCharacter> characters = gameCharacterRep.findTop8ByOrderByPkKillsDesc();
+
+        List<TopPkPlayerDTO> dtos = new ArrayList<>();
+        for (GameCharacter character : characters) {
+            dtos.add(new TopPkPlayerDTO(
+                    character.getCharName(),
+                    character.getPkKills()
+            ));
+        }
+
+        return ResponseEntity.ok(dtos);
     }
 
 }

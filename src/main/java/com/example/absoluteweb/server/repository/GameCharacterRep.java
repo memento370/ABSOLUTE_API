@@ -11,4 +11,8 @@ public interface GameCharacterRep extends JpaRepository<GameCharacter, Integer> 
     List<GameCharacter> findByAccountName(String accountName);
 
     int countByOnline(int online);
+
+    List<GameCharacter> findTop8ByOrderByPvpKillsDesc();
+
+    List<GameCharacter> findTop8ByOrderByPkKillsDesc();
 }

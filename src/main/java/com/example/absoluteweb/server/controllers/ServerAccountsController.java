@@ -1,6 +1,8 @@
 package com.example.absoluteweb.server.controllers;
 
 import com.example.absoluteweb.server.DTO.CharacterDTO;
+import com.example.absoluteweb.server.DTO.TopPkPlayerDTO;
+import com.example.absoluteweb.server.DTO.TopPvpPlayerDTO;
 import com.example.absoluteweb.server.entity.GameCharacter;
 import com.example.absoluteweb.server.services.ServerAccountsService;
 import com.example.absoluteweb.site.DTO.SiteRegistrationRequest;
@@ -33,5 +35,15 @@ public class ServerAccountsController {
     @GetMapping("/getOnline")
     public int getOnline(){
         return accountsService.getOnline();
+    }
+
+    @GetMapping("/top/pvp")
+    public ResponseEntity<List<TopPvpPlayerDTO>> getTopPvpPlayers() {
+        return accountsService.getTopPvpPlayers();
+    }
+
+    @GetMapping("/top/pk")
+    public ResponseEntity<List<TopPkPlayerDTO>> getTopPkPlayers() {
+        return accountsService.getTopPkPlayers();
     }
 }
