@@ -64,7 +64,9 @@ public class SecurityConfig {
                                 "/api/site/accounts/login",
                                 "api/site/accounts/password-reset/request",
                                 "api/site/accounts/password-reset/confirm",
-                                "/api/server/accounts/getOnline"
+                                "/api/server/accounts/getOnline",
+                                "/api/server/accounts/top/pk",
+                                "/api/server/accounts/top/pvp"
 
 
                 ).permitAll()
